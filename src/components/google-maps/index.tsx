@@ -15,7 +15,7 @@ interface GoogleMapsProps {
 
 const GoogleMaps: React.FC<GoogleMapsProps> = ({ styles }) =>  {
   const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: 'AIzaSyCC7R8yqA3_SPwdA1ve5sAuO8-5WQb0-MM',
+    googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY as string,
     libraries,
   });
 
