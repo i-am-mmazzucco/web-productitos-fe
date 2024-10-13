@@ -12,7 +12,7 @@ const HomeComponent = () => {
 	return (
     <>
       <Head>
-        <title>Welcome</title>
+        <title>Bienvenido</title>
       </Head>
       <div style={{ maxWidth: '1200px', margin: '4% auto', padding: '20px' }}>
         <main style={{ 

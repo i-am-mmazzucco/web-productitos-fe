@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import React from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -16,7 +17,7 @@ const Product = () => {
 	return (
 		<>
 			<Head>
-        <title>Product name</title>
+        <title style={{ fontWeight: 'bold' }}>Product name</title>
       </Head>
 			<div style={{
 				display: 'flex',
@@ -55,7 +56,7 @@ const Product = () => {
 						padding: '10px',
 						marginBottom: '30px',
 					}}>
-						<h2 style={{ margin: '0 0 10px 0', width: '100%', display: 'flex', justifyContent: 'center' }}>COCA COLA</h2>
+						<h2 style={{ margin: '0 0 10px 0', width: '100%', display: 'flex', justifyContent: 'center', fontWeight: 'bold' }}>COCA COLA</h2>
 						<div style={{
 							height: '100%',
 							width: '100%',
@@ -64,21 +65,30 @@ const Product = () => {
 							alignItems: 'center',
 							fontSize: '18px',
 						}}>
-							<img src={product?.imageUrl} alt="Product" style={{ width: '100%', height: '100%', borderRadius: '18px' }} />
+							<img 
+								src={product?.imageUrl} 
+								alt="Product" 
+								style={{ 
+									width: '100%', 
+									height: '250px',
+									objectFit: 'contain',
+									objectPosition: 'center'
+								}} 
+							/>
 						</div>
 					</div>
 					<div style={{
 						padding: '10px',
 					}}>
-						<h3 style={{ margin: '0 0 10px 0', width: '100%', display: 'flex', justifyContent: 'center' }}>TIENDAS</h3>
+						<h3 style={{ margin: '0 0 10px 0', width: '100%', display: 'flex', justifyContent: 'center', fontWeight: 'bold' }}>TIENDAS</h3>
 						<ul style={{
 							listStyle: 'none',
 							padding: '0',
 							margin: '0',
 						}}>
 							{[...Array(7)].map((_, index) => (
-								<div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-									<li key={index} style={{
+								<div key={index} style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+									<li style={{
 										padding: '5px 0',
 										color: '#1d1d1f', 
 										fontWeight: 'bold',
@@ -90,7 +100,7 @@ const Product = () => {
 									}}>
 										PUNTO CERO
 									</li>
-									<li key={index} style={{
+									<li style={{
 										padding: '5px 0',
 										color: '#1d1d1f', 
 										fontWeight: 'bold',
@@ -98,7 +108,7 @@ const Product = () => {
 									}}>
 										📍 3km's
 									</li>
-									<li key={index} style={{
+									<li style={{
 										padding: '5px 0',
 										color: '#1d1d1f', 
 										fontWeight: 'bold',
