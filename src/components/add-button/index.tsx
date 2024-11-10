@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { FormModal } from '../form-modal';
+import { FormModal } from '../../modals/form-modal';
 
 export const AddButton: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
