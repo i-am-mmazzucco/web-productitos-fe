@@ -17,7 +17,7 @@ const center = {
 };
 
 const googleMapsApiKey = process.env.googleMapsApiKey as string;
-const url = process.env.BE_URL as string;
+const url = process.env.beUrl as string;
 
 const cordobaBounds = {
   north: -31.2,
@@ -30,6 +30,7 @@ export const FormPrice: React.FC<FormPriceProps> = ({ buttonName }) => {
   const [mapPosition, setMapPosition] = useState<{lat: number, lng: number}>(center);
   const [storeName, setStoreName] = useState<string>('');
   const [product, setProduct] = useState<string>('');
+  const [price, setPrice] = useState<string>('');
 
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey,
@@ -53,8 +54,6 @@ export const FormPrice: React.FC<FormPriceProps> = ({ buttonName }) => {
         setMapPosition({ lat, lng });
         setStoreName(place.name || '');
       }
-    } else {
-      alert("Por favor selecciona una tienda válida.");
     }
   }, []);
 
@@ -74,34 +73,37 @@ export const FormPrice: React.FC<FormPriceProps> = ({ buttonName }) => {
   }, []);
 
   const handleFormSubmit = async (e: React.FormEvent) => {
-    console.log(mapPosition)
-    console.log(storeName)
-    console.log(product)
-
     e.preventDefault();
-    // try {
-    //   const response = await fetch(`${url}/results`, {
-    //     method: 'POST',
-    //     headers:{
-    //        'Content-Type': 'application/json'
-    //     },
-    //     body: JSON.stringify(this.state)
-    //   });
-    //   const data = await response.json();
 
-    //   if (data.statusCode) {
-    //     throw new Error(`Was an error posting data. ${JSON.stringify(data)}`)
-    //   }
+    try {
+      const response = await fetch(`${url}/price`, {
+        method: 'POST',
+        headers:{
+           'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          storeName,
+          productId: product, // TODO: To change, this product return the number
+          coordinates: { lat: mapPosition.lat, lng: mapPosition.lng },
+          newPrice: price
+        })
+      });
+      const data = await response.json();
 
-    //   this.props.history.push('/thank-you');
+      if (data.statusCode) {
+        throw new Error(`Was an error posting data. ${JSON.stringify(data)}`)
+      }
+
+      // this.props.history.push('/thank-you');
     
-    //  } catch (error) {
-    //     console.log(error);
-    //  }
+     } catch (error) {
+        console.log(error);
+     }
   };
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    
+    const inputPrice = e.currentTarget.value;
+    setPrice(inputPrice);
   }
 
   const handleProductChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
