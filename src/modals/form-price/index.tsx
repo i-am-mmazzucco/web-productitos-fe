@@ -29,7 +29,7 @@ const cordobaBounds = {
 export const FormPrice: React.FC<FormPriceProps> = ({ buttonName }) => {
   const [mapPosition, setMapPosition] = useState<{lat: number, lng: number}>(center);
   const [storeName, setStoreName] = useState<string>('');
-  const [product, setProduct] = useState<string>('');
+  const [idProduct, setIdProduct] = useState<string>('');
   const [price, setPrice] = useState<string>('');
 
   const { isLoaded } = useJsApiLoader({
@@ -76,16 +76,15 @@ export const FormPrice: React.FC<FormPriceProps> = ({ buttonName }) => {
     e.preventDefault();
 
     try {
-      const response = await fetch(`${url}/price`, {
+      const response = await fetch(`${url}/price/${idProduct}`, {
         method: 'POST',
         headers:{
            'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           storeName,
-          productId: product, // TODO: To change, this product return the number
           coordinates: { lat: mapPosition.lat, lng: mapPosition.lng },
-          newPrice: price
+          amount: price
         })
       });
       const data = await response.json();
@@ -108,7 +107,7 @@ export const FormPrice: React.FC<FormPriceProps> = ({ buttonName }) => {
 
   const handleProductChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedProduct = e.target.value;
-    setProduct(selectedProduct);
+    setIdProduct(selectedProduct);
   };
 
   const { products } = React.useContext(ProductsContext);
@@ -150,7 +149,7 @@ export const FormPrice: React.FC<FormPriceProps> = ({ buttonName }) => {
               <select
                 id="product"
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                value={product}
+                value={idProduct}
                 onChange={handleProductChange}
               >
                 <option value="">Seleccionar un producto</option>
