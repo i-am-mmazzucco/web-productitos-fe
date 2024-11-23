@@ -1,10 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 
 import { ProductsContext } from "@/components/context";
 import GoogleMaps from "@/components/google-maps";
+import { getHaversine } from "@/helpers/getters";
+import { Header } from "@/components/header";
 
 const Product = () => {
 	const router = useRouter();
@@ -12,12 +14,59 @@ const Product = () => {
 
 	const { products } = React.useContext(ProductsContext);
 	
-	const product = products.find(prod => JSON.stringify(prod.id) === id);
+	const product = products.find(prod => prod._id === id);
+	
+	const [userLocation, setUserLocation] = useState<{ lat: number; long: number } | null>(null);
+	const [distances, setDistances] = useState<{ [storeId: string]: number }>({}); // Distancias por tienda
+	const [markers, setMarkers] = useState<
+		{ id: string; lat: number; long: number; name: string }[]
+	>([]);
+
+	useEffect(() => {
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(
+				(position) => {
+					setUserLocation({
+						lat: position.coords.latitude,
+						long: position.coords.longitude,
+					});
+				},
+				(error) => {
+					console.error("Error obteniendo ubicación del usuario:", error);
+				}
+			);
+		}
+	}, []);
+
+	useEffect(() => {
+		if (userLocation && product?.stores) {
+			const calculatedDistances = product.stores.reduce((acc, store) => {
+				return {
+					...acc,
+					[store._id]: getHaversine(
+						userLocation.lat,
+						userLocation.long,
+						store.lat,
+						store.long
+					),
+				};
+			}, {})
+			const storeMarkers = product.stores.map((store) => ({
+				id: store._id,
+				lat: store.lat,
+				long: store.long,
+				name: store.name,
+			}));
+
+			setMarkers(storeMarkers);
+			setDistances(calculatedDistances);
+		}
+	}, [userLocation, product?.stores]);
 
 	return (
 		<>
 			<Head>
-        <title style={{ fontWeight: 'bold' }}>Product name</title>
+        <title style={{ fontWeight: 'bold' }}>{product?.name}</title>
       </Head>
 			<div style={{
 				display: 'flex',
@@ -34,13 +83,12 @@ const Product = () => {
 					alignItems: 'center',
 					width: '70%',
 					height: '90%',
-					zIndex: '1000'
 				}}>
 					<GoogleMaps styles={{
 						width: '100%',
 						height: '100%',
-						borderRadius: '18px'
-					}} />
+						borderRadius: '18px',
+					}} markers={markers} />
 				</div>
 				<div style={{
 					flex: '1',
@@ -56,7 +104,7 @@ const Product = () => {
 						padding: '10px',
 						marginBottom: '30px',
 					}}>
-						<h2 style={{ margin: '0 0 10px 0', width: '100%', display: 'flex', justifyContent: 'center', fontWeight: 'bold' }}>COCA COLA</h2>
+						<h2 style={{ margin: '0 0 10px 0', width: '100%', display: 'flex', justifyContent: 'center', fontWeight: 'bold' }}>{product?.name}</h2>
 						<div style={{
 							height: '100%',
 							width: '100%',
@@ -86,38 +134,69 @@ const Product = () => {
 							padding: '0',
 							margin: '0',
 						}}>
-							{[...Array(7)].map((_, index) => (
-								<div key={index} style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-									<li style={{
-										padding: '5px 0',
-										color: '#1d1d1f', 
-										fontWeight: 'bold',
-										width: '42%',
-										display: 'flex',
-										justifyContent: 'center',
-										alignItems: 'center',
-										alignContent: 'center'
-									}}>
-										PUNTO CERO
-									</li>
-									<li style={{
-										padding: '5px 0',
-										color: '#1d1d1f', 
-										fontWeight: 'bold',
-										width: '29%',
-									}}>
-										📍 3km's
-									</li>
-									<li style={{
-										padding: '5px 0',
-										color: '#1d1d1f', 
-										fontWeight: 'bold',
-										width: '29%'
-									}}>
-										💲 {(Math.random() * 100).toFixed(2)}
-									</li>
-								</div>
-							))}
+							{product?.prices.sort((a, b) => a.amount - b.amount).map((price) => {
+								const store = product.stores.find(store => store._id === price.store);
+								const distance = distances[store?._id!];
+
+								return (
+									<div
+										key={price._id}
+										style={{
+											display: 'flex',
+											justifyContent: 'space-between',
+											alignItems: 'center',
+											width: '100%',
+											marginBottom: '10px', // Espacio entre cada fila
+											padding: '5px 0',
+											borderBottom: '1px solid #e0e0e0', // Línea separadora entre filas
+										}}
+									>
+										<li
+											style={{
+												padding: '5px 0',
+												color: '#1d1d1f',
+												fontWeight: 'bold',
+												width: '42%',
+												display: 'flex',
+												justifyContent: 'flex-start',
+												alignItems: 'center',
+												overflow: 'hidden',
+												textOverflow: 'ellipsis',
+												whiteSpace: 'nowrap', // Mantiene el texto en una línea
+											}}
+											title={store?.name} // Muestra el nombre completo al pasar el mouse
+										>
+											{store?.name.toUpperCase()}
+										</li>
+										<li
+											style={{
+												padding: '5px 0',
+												color: '#1d1d1f',
+												fontWeight: 'bold',
+												width: '29%',
+												display: 'flex',
+												justifyContent: 'center',
+												alignItems: 'center',
+											}}
+										>
+											📍 {distance ? `${distance.toFixed(2)} km` : '... km'}
+										</li>
+										<li
+											style={{
+												padding: '5px 0',
+												color: '#1d1d1f',
+												fontWeight: 'bold',
+												width: '29%',
+												display: 'flex',
+												justifyContent: 'center',
+												alignItems: 'center',
+											}}
+										>
+											💲 {price.amount}
+										</li>
+									</div>
+								)
+							})}
 						</ul>
 					</div>
 				</div>

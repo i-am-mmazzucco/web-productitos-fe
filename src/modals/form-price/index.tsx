@@ -3,6 +3,9 @@ import { GoogleMap, Marker, useJsApiLoader, Autocomplete } from '@react-google-m
 import { ProductsContext } from '../../components/context';
 
 interface FormPriceProps {
+  reloadProducts: () => Promise<void>;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setAddOpen: React.Dispatch<React.SetStateAction<boolean>>;
   buttonName: string;
 }
 
@@ -26,11 +29,11 @@ const cordobaBounds = {
   west: -64.5,
 };
 
-export const FormPrice: React.FC<FormPriceProps> = ({ buttonName }) => {
+export const FormPrice: React.FC<FormPriceProps> = ({ setIsOpen, setAddOpen, reloadProducts, buttonName }) => {
   const [mapPosition, setMapPosition] = useState<{lat: number, lng: number}>(center);
   const [storeName, setStoreName] = useState<string>('');
   const [idProduct, setIdProduct] = useState<string>('');
-  const [price, setPrice] = useState<string>('');
+  const [price, setPrice] = useState<number | null>(null);
 
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey,
@@ -57,26 +60,11 @@ export const FormPrice: React.FC<FormPriceProps> = ({ buttonName }) => {
     }
   }, []);
 
-  const onMapClick = useCallback((e: any) => {
-    const newLat = e.latLng.lat();
-    const newLng = e.latLng.lng();
-    setMapPosition({ lat: newLat, lng: newLng });
-
-    if (!geocoder.current) {
-      geocoder.current = new google.maps.Geocoder();
-    }
-    geocoder.current.geocode({ location: { lat: newLat, lng: newLng } }, (results, status) => {
-      if (status === 'OK' && results?.[0]) {
-        setStoreName(results[0].formatted_address);
-      }
-    });
-  }, []);
-
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      const response = await fetch(`${url}/price/${idProduct}`, {
+      const response = await fetch(`${url}/products/${idProduct}/add-price`, {
         method: 'POST',
         headers:{
            'Content-Type': 'application/json'
@@ -93,8 +81,9 @@ export const FormPrice: React.FC<FormPriceProps> = ({ buttonName }) => {
         throw new Error(`Was an error posting data. ${JSON.stringify(data)}`)
       }
 
-      // this.props.history.push('/thank-you');
-    
+      await reloadProducts()
+      setIsOpen(false);
+      setAddOpen(false);
      } catch (error) {
         console.log(error);
      }
@@ -102,7 +91,7 @@ export const FormPrice: React.FC<FormPriceProps> = ({ buttonName }) => {
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputPrice = e.currentTarget.value;
-    setPrice(inputPrice);
+    setPrice(parseFloat(inputPrice));
   }
 
   const handleProductChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -154,7 +143,7 @@ export const FormPrice: React.FC<FormPriceProps> = ({ buttonName }) => {
               >
                 <option value="">Seleccionar un producto</option>
                 {products.map((product) => (
-                  <option key={product.id} value={product.id}>
+                  <option key={product._id} value={product._id}>
                     {product.name}
                   </option>
                 ))}
@@ -182,7 +171,6 @@ export const FormPrice: React.FC<FormPriceProps> = ({ buttonName }) => {
                 mapContainerStyle={containerStyle}
                 center={mapPosition}
                 zoom={15}
-                onClick={onMapClick}
               >
                 <Marker position={mapPosition} />
               </GoogleMap>

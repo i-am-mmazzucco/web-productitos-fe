@@ -1,10 +1,13 @@
 import { useState } from "react";
 
 interface FormProductProps {
+  reloadProducts: () => Promise<void>;
+  setAddOpen: React.Dispatch<React.SetStateAction<boolean>>;
+	setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 	buttonName: string;
 }
 
-export const FormProduct: React.FC<FormProductProps> = ({ buttonName }) => {
+export const FormProduct: React.FC<FormProductProps> = ({ reloadProducts, setIsOpen, buttonName }) => {
 	const [image, setImage] = useState<File | null>(null);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {

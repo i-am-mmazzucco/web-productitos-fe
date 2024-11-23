@@ -6,8 +6,11 @@ import { AddButton } from '@/components/add-button';
 import Head from 'next/head';
 
 const HomeComponent = () => {
-  // TODO: To connect with API
-  const { products } = React.useContext(ProductsContext);
+  const { products, filteredProducts, reloadProducts, shouldPopUpSearch } = React.useContext(ProductsContext);
+
+  const validProducts = filteredProducts.length && !shouldPopUpSearch ? filteredProducts : products;
+
+  console.log(filteredProducts)
 
 	return (
     <>
@@ -21,13 +24,13 @@ const HomeComponent = () => {
           gap: '20px' 
         }}>
           {
-            products.map((product) => (
-              <Link href={`/product/${product.id}`} key={product.id} passHref className='home-map'>
-                <ProductCard key={product.id} {...product} />
+            validProducts.map((product) => (
+              <Link href={`/product/${product._id}`} key={product._id} passHref className='home-map'>
+                <ProductCard key={product._id} {...product} />
               </Link>
             ))
           }
-          <AddButton />
+          <AddButton reloadProducts={reloadProducts}/>
         </main>
       </div>
     </>

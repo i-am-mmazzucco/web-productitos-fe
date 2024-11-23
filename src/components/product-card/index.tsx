@@ -1,14 +1,43 @@
 /* eslint-disable @next/next/no-img-element */
-import React from 'react';
+import { getHaversine } from '@/helpers/getters';
+import { IProduct } from '@/interfaces/products.interface';
+import React, { useEffect, useState } from 'react';
 
-interface ProductProps {
-  imageUrl: string;
-  price: number;
-  location: string;
-  name: string;
-}
+export const ProductCard: React.FC<IProduct> = ({ imageUrl, name, prices, stores }) => {
+  const [userLocation, setUserLocation] = useState<{ lat: number; long: number } | null>(null);
+  const [distance, setDistance] = useState<string | null>(null);
 
-export const ProductCard: React.FC<ProductProps> = ({ imageUrl, price, location, name }) => {
+  const minPrice = prices.reduce((min, item) => {
+    return item.amount < min.amount ? item : min;
+  }, prices[0]);
+  
+  const store = stores.find(store => store._id === minPrice.store);
+
+  useEffect(() => {
+    if (navigator.geolocation && store) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const userLat = position.coords.latitude;
+          const userLong = position.coords.longitude;
+
+          setUserLocation({ lat: userLat, long: userLong });
+
+          const distanceToStore = getHaversine(
+            userLat,
+            userLong,
+            store.lat,
+            store.long
+          );
+
+          setDistance(distanceToStore.toFixed(2)); // Format to two decimals
+        },
+        (error) => {
+          console.error('Error:', error);
+        }
+      );
+    }
+  }, [store]);
+  
   return (
     <div style={{ 
       borderRadius: '18px', 
@@ -33,9 +62,9 @@ export const ProductCard: React.FC<ProductProps> = ({ imageUrl, price, location,
       }} />
       <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'space-between' }}>
         <p style={{ color: '#1d1d1f', fontWeight: 'bold' }}>
-          💲 {price}
+          💲 {minPrice.amount}
         </p>
-        <p style={{ color: '#1d1d1f', fontWeight: 'bold' }}>📍 {location}</p>
+        <p style={{ color: '#1d1d1f', fontWeight: 'bold' }}>📍  {distance ? `${distance} km` : '... km'}</p>
       </div>
     </div>
   );

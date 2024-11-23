@@ -1,17 +1,18 @@
-import { useState } from "react";
 import { FormProduct } from "../form-product";
 import { FormPrice } from "../form-price";
 
 interface FormModalProps {
+  reloadProducts: () => Promise<void>;
   isOpen: boolean;
 	setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 	setAddButton: React.Dispatch<React.SetStateAction<boolean>>;
+  setAddOpen: React.Dispatch<React.SetStateAction<boolean>>;
 	title: string;
 	buttonName: string;
 	type: 'price' | 'product';
 }
 
-export const FormModal: React.FC<FormModalProps> = ({ isOpen, setIsOpen, setAddButton, title, buttonName, type }) => {
+export const FormModal: React.FC<FormModalProps> = ({ reloadProducts, isOpen, setAddOpen, setIsOpen, setAddButton, title, buttonName, type }) => {
 
 	return (<>
 	      {isOpen && (
@@ -35,10 +36,10 @@ export const FormModal: React.FC<FormModalProps> = ({ isOpen, setIsOpen, setAddB
               </div>
 
               {/* Modal Body Product */}
-							{type ==='product' && (<FormProduct buttonName={buttonName} />)}
+							{type ==='product' && (<FormProduct setAddOpen={setAddOpen} reloadProducts={reloadProducts} setIsOpen={setIsOpen} buttonName={buttonName} />)}
 
 							{/* Modal Body Price */}
-							{type ==='price' && (<FormPrice buttonName={buttonName} />)}
+							{type ==='price' && (<FormPrice setAddOpen={setAddOpen} reloadProducts={reloadProducts} setIsOpen={setIsOpen} buttonName={buttonName} />)}
             </div>
           </div>
         </div>

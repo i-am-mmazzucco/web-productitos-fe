@@ -9,11 +9,19 @@ const center = {
   lng: -64.16764, // default longitude
 };
 
-interface GoogleMapsProps {
-	styles: Record<string, string>
+interface MarkerProps {
+  id: string;
+  lat: number;
+  long: number;
+  name: string;
 }
 
-const GoogleMaps: React.FC<GoogleMapsProps> = ({ styles }) =>  {
+interface GoogleMapsProps {
+	styles: Record<string, string>;
+  markers: MarkerProps[];
+}
+
+const GoogleMaps: React.FC<GoogleMapsProps> = ({ styles, markers}) =>  {
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: process.env.googleMapsApiKey as string,
     libraries,
@@ -34,7 +42,13 @@ const GoogleMaps: React.FC<GoogleMapsProps> = ({ styles }) =>  {
 			zoom={12}
 			center={center}
 		>
-			<Marker position={center} />
+			 {markers.map((marker) => (
+        <Marker
+          key={marker.id}
+          position={{ lat: marker.lat, lng: marker.long }}
+          title={marker.name}
+        />
+      ))}
 		</GoogleMap>
 	)
 }
