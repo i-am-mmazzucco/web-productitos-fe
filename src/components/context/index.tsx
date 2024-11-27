@@ -45,7 +45,7 @@ export const ProductsProvider = ({
 
       setProducts(data);
      } catch (error) {
-        console.log(error);
+        console.log("Error: ", error);
      }
   };
 

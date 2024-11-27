@@ -10,7 +10,7 @@ const HomeComponent = () => {
 
   const validProducts = filteredProducts.length && !shouldPopUpSearch ? filteredProducts : products;
 
-  console.log(filteredProducts)
+  const productsWithAtLeastOneStore = validProducts.filter(product => product.stores.length && product.prices.length);
 
 	return (
     <>
@@ -24,7 +24,7 @@ const HomeComponent = () => {
           gap: '20px' 
         }}>
           {
-            validProducts.map((product) => (
+            productsWithAtLeastOneStore.map((product) => (
               <Link href={`/product/${product._id}`} key={product._id} passHref className='home-map'>
                 <ProductCard key={product._id} {...product} />
               </Link>

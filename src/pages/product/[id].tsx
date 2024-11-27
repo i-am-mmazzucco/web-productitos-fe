@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 import React, { useEffect, useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -6,7 +5,7 @@ import { useRouter } from "next/router";
 import { ProductsContext } from "@/components/context";
 import GoogleMaps from "@/components/google-maps";
 import { getHaversine } from "@/helpers/getters";
-import { Header } from "@/components/header";
+import Image from "next/image";
 
 const Product = () => {
 	const router = useRouter();
@@ -17,7 +16,7 @@ const Product = () => {
 	const product = products.find(prod => prod._id === id);
 	
 	const [userLocation, setUserLocation] = useState<{ lat: number; long: number } | null>(null);
-	const [distances, setDistances] = useState<{ [storeId: string]: number }>({}); // Distancias por tienda
+	const [distances, setDistances] = useState<{ [storeId: string]: number }>({});
 	const [markers, setMarkers] = useState<
 		{ id: string; lat: number; long: number; name: string }[]
 	>([]);
@@ -32,7 +31,7 @@ const Product = () => {
 					});
 				},
 				(error) => {
-					console.error("Error obteniendo ubicación del usuario:", error);
+					console.error("Error: ", error);
 				}
 			);
 		}
@@ -84,11 +83,14 @@ const Product = () => {
 					width: '70%',
 					height: '90%',
 				}}>
-					<GoogleMaps styles={{
-						width: '100%',
-						height: '100%',
-						borderRadius: '18px',
-					}} markers={markers} />
+					<GoogleMaps 
+						styles={{
+							width: '100%',
+							height: '100%',
+							borderRadius: '18px',
+						}} 
+						markers={markers} 
+					/>
 				</div>
 				<div style={{
 					flex: '1',
@@ -113,8 +115,8 @@ const Product = () => {
 							alignItems: 'center',
 							fontSize: '18px',
 						}}>
-							<img 
-								src={product?.imageUrl} 
+							<Image
+								src={product?.imageUrl!} 
 								alt="Product" 
 								style={{ 
 									width: '100%', 
@@ -122,6 +124,8 @@ const Product = () => {
 									objectFit: 'contain',
 									objectPosition: 'center'
 								}} 
+								width={100}
+								height={100}
 							/>
 						</div>
 					</div>

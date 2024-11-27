@@ -41,7 +41,6 @@ export const FormPrice: React.FC<FormPriceProps> = ({ setIsOpen, setAddOpen, rel
   });
 
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
-  const geocoder = useRef<google.maps.Geocoder | null>(null);
 
   const onLoad = useCallback((autocomplete: google.maps.places.Autocomplete) => {
     autocompleteRef.current = autocomplete;
@@ -50,13 +49,11 @@ export const FormPrice: React.FC<FormPriceProps> = ({ setIsOpen, setAddOpen, rel
   const onPlaceChanged = useCallback(() => {
     const place = autocompleteRef.current?.getPlace();
     
-    if (place?.types && (place.types.includes("store") || place.types.includes("shopping_mall"))) {
-      if (place.geometry?.location) {
-        const lat = place.geometry.location.lat();
-        const lng = place.geometry.location.lng();
-        setMapPosition({ lat, lng });
-        setStoreName(place.name || '');
-      }
+    if (place?.geometry?.location) {
+      const lat = place.geometry.location.lat();
+      const lng = place.geometry.location.lng();
+      setMapPosition({ lat, lng });
+      setStoreName(place.name || '');
     }
   }, []);
 
@@ -85,8 +82,8 @@ export const FormPrice: React.FC<FormPriceProps> = ({ setIsOpen, setAddOpen, rel
       setIsOpen(false);
       setAddOpen(false);
      } catch (error) {
-        console.log(error);
-     }
+        console.log("Error: ", error);
+    }
   };
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -108,7 +105,7 @@ export const FormPrice: React.FC<FormPriceProps> = ({ setIsOpen, setAddOpen, rel
           <div className="grid gap-4 mb-4 grid-cols-2">
             <div className="col-span-2">
               <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                Nombre de la tienda
+                Nombre de la tienda <span className="text-red-500">*</span>
               </label>
               <Autocomplete 
                 onLoad={onLoad} 
@@ -133,7 +130,7 @@ export const FormPrice: React.FC<FormPriceProps> = ({ setIsOpen, setAddOpen, rel
             </div>
             <div className="col-span-2">
               <label htmlFor="product" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                Producto
+                Producto <span className="text-red-500">*</span>
               </label>
               <select
                 id="product"
@@ -151,7 +148,7 @@ export const FormPrice: React.FC<FormPriceProps> = ({ setIsOpen, setAddOpen, rel
             </div>
             <div className="col-span-2">
               <label htmlFor="price" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                Precio producto ($ARS)
+                Precio producto ($ARS) <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"

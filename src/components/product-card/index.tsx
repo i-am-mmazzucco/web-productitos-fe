@@ -62,7 +62,7 @@ export const ProductCard: React.FC<IProduct> = ({ imageUrl, name, prices, stores
       }} />
       <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'space-between' }}>
         <p style={{ color: '#1d1d1f', fontWeight: 'bold' }}>
-          💲 {minPrice.amount}
+          💲 {minPrice?.amount}
         </p>
         <p style={{ color: '#1d1d1f', fontWeight: 'bold' }}>📍  {distance ? `${distance} km` : '... km'}</p>
       </div>

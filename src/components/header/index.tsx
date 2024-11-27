@@ -19,7 +19,7 @@ export const Header: React.FC = () => {
         <div style={{ cursor: 'pointer', display: 'inline-block', width: '100%', height: '100%' }}>
           <Link href="/" passHref>
             <Image 
-              src={'logo-no-background.svg'} 
+              src={'/logo-no-background.svg'} 
               style={{ 
                 width: '100%', 
                 height: '100%', 
